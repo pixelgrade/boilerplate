@@ -8,7 +8,6 @@
  * @see         https://pixelgrade.com
  * @author      Pixelgrade
  * @package     Components
- * @version     2.0.1
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -147,7 +146,7 @@ if ( ! function_exists( 'pixelgrade_locate_component_file' ) ) {
 			$template_names = array();
 
 			if ( true === $lookup_theme_root ) {
-				// We need to look first in the theme root
+				// We need to look first in the theme root.
 				// But we have a problem with the way locate_template() works:
 				// it looks in the /wp-includes/theme-compat/ directory as a last resort!
 				// This prevents using the rest of the template candidates when there actually is a file there (like header.php).
@@ -569,7 +568,8 @@ if ( ! function_exists( 'pixelgrade_get_template_part' ) ) {
 		$located = pixelgrade_locate_template_part( $template_slug, $template_path, $template_name, $default_path );
 
 		if ( ! file_exists( $located ) ) {
-			_doing_it_wrong( __FUNCTION__, sprintf( __( '%s does not exist.', 'pixelgrade_care' ), '<code>' . $located . '</code>' ), null );
+			/* translators: %s: the template part located path */
+			_doing_it_wrong( __FUNCTION__, sprintf( esc_html__( '%s does not exist.', '__components_txtd' ), '<code>' . esc_html( $located ) . '</code>' ), null );
 
 			return;
 		}
@@ -577,6 +577,7 @@ if ( ! function_exists( 'pixelgrade_get_template_part' ) ) {
 		// Allow 3rd party plugins or themes to filter template file.
 		$located = apply_filters( 'pixelgrade_get_template_part', $located, $template_slug, $template_path, $args, $template_name, $default_path );
 
+		// phpcs:ignore
 		include( $located );
 	}
 }

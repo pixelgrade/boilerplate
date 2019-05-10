@@ -8,7 +8,6 @@
  * @see         https://pixelgrade.com
  * @author      Pixelgrade
  * @package     Components/Multipage
- * @version     1.1.2
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -44,7 +43,8 @@ class Pixelgrade_Multipage extends Pixelgrade_Component {
 
 		// Check/validate the modified config
 		if ( method_exists( $this, 'validate_config' ) && ! $this->validate_config( $modified_config ) ) {
-			_doing_it_wrong( __METHOD__, sprintf( 'The component config  modified through the "pixelgrade_%1$s_initial_config" dynamic filter is invalid! Please check the modifications you are trying to do!', $hook_slug ), null );
+			/* translators: 1: the component slug  */
+			_doing_it_wrong( __METHOD__, sprintf( 'The component config  modified through the "pixelgrade_%1$s_initial_config" dynamic filter is invalid! Please check the modifications you are trying to do!', esc_html( $hook_slug ) ), null );
 			return;
 		}
 
@@ -113,10 +113,12 @@ class Pixelgrade_Multipage extends Pixelgrade_Component {
 	public function enqueueScripts() {
 		// Register the frontend styles and scripts specific to multipages
 		wp_register_script( 'pixelgrade_multipage-scripts', pixelgrade_get_theme_file_uri( trailingslashit( PIXELGRADE_COMPONENTS_PATH ) . trailingslashit( self::COMPONENT_SLUG ) . 'js/jquery.bully.js' ), array( 'jquery' ), $this->assets_version, true );
+		wp_register_style( 'pixelgrade_multipage-styles', pixelgrade_get_theme_file_uri( trailingslashit( PIXELGRADE_COMPONENTS_PATH ) . trailingslashit( self::COMPONENT_SLUG ) . 'css/style.css' ) );
 
 		// See if we need to enqueue something for multipages
 		if ( is_page() && pixelgrade_multipage_has_children() ) {
 			wp_enqueue_script( 'pixelgrade_multipage-scripts' );
+			wp_enqueue_style( 'pixelgrade_multipage-styles' );
 		}
 	}
 

@@ -7,7 +7,6 @@
  * @see         https://pixelgrade.com
  * @author      Pixelgrade
  * @package     Components/Footer
- * @version     1.1.6
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -96,7 +95,7 @@ function pixelgrade_footer_the_sidebar( $sidebar_id, $sidebar_settings ) {
 		return;
 	}
 
-	$classes = array( 'widget-area', 'widget-area--' . $sidebar_id );
+	$classes = array( 'widget-area', 'widget-area--' . sanitize_html_class( $sidebar_id ) );
 	if ( ! empty( $sidebar_settings['container_class'] ) ) {
 		$extra_class = $sidebar_settings['container_class'];
 		if ( ! is_array( $extra_class ) ) {
@@ -106,7 +105,7 @@ function pixelgrade_footer_the_sidebar( $sidebar_id, $sidebar_settings ) {
 		$classes = array_merge( $classes, $extra_class );
 	} ?>
 
-<aside <?php pixelgrade_css_class( $classes, array( 'footer', 'sidebar', $sidebar_id ) ); ?>>
+<aside <?php pixelgrade_css_class( $classes, array( 'footer', 'sidebar', sanitize_html_class( $sidebar_id ), ) ); ?>>
 	<?php dynamic_sidebar( $sidebar_id ); ?>
 </aside>
 
@@ -119,7 +118,7 @@ function pixelgrade_footer_the_sidebar( $sidebar_id, $sidebar_settings ) {
  * @param array  $args An array with options for the wp_nav_menu() function.
  * @param string $menu_location Optional. The menu location id (slug) to process.
  *
- * @return false|void
+ * @return false|string
  */
 function pixelgrade_footer_the_nav_menu( $args, $menu_location = '' ) {
 	$defaults = array(
@@ -185,7 +184,9 @@ function pixelgrade_footer_get_nav_menu( $args, $menu_location = '' ) {
  * Display the footer back to top link
  */
 function pixelgrade_footer_the_back_to_top_link() {
-	echo pixelgrade_footer_get_back_to_top_link();
+	if ( pixelgrade_user_has_access( 'pro-features' ) ) {
+		echo pixelgrade_footer_get_back_to_top_link(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	}
 }
 
 /**
@@ -204,40 +205,66 @@ function pixelgrade_footer_get_back_to_top_link() {
  * Display the footer copyright.
  */
 function pixelgrade_footer_the_copyright() {
-	$copyright_text = pixelgrade_footer_get_copyright_content();
 
 	$output = '';
-	if ( ! empty( $copyright_text ) ) {
-		$output      .= '<div class="c-footer__copyright-text">' . PHP_EOL;
-		$output      .= $copyright_text . PHP_EOL;
-		$hide_credits = pixelgrade_option( 'footer_hide_credits', false );
-		if ( empty( $hide_credits ) ) {
-			$output .= '<span class="c-footer__credits">' . sprintf( esc_html__( 'Made with love by %s.', '__components_txtd' ), '<a href="https://pixelgrade.com/" target="_blank">Pixelgrade</a>' ) . '</span>' . PHP_EOL;
+
+	if ( pixelgrade_user_has_access( 'pro-features' ) ) {
+		$copyright_text = pixelgrade_footer_get_copyright_content();
+		if ( ! empty( $copyright_text ) ) {
+			$output .= "<div class=\"c-footer__copyright-text\">\n";
+
+			$output .= wp_kses_post( $copyright_text ) . "\n";
+
+			$hide_credits = pixelgrade_option( 'footer_hide_credits', false );
+			if ( empty( $hide_credits ) ) {
+				$output .= pixelgrade_get_footer_credits() . "\n";
+			}
+
+			$output .= "</div>\n";
 		}
-		$output .= '</div>' . PHP_EOL;
+	} else {
+		$output .= "<div class=\"c-footer__copyright-text\">\n";
+
+		/* translators: %year%: current year  %site-title%: the site title */
+		$copyright_text = pixelgrade_parse_content_tags( esc_html__( '&copy; %year% %site-title%.', '__components_txtd' ) );
+		if ( ! empty( $copyright_text ) ) {
+			$output .= $copyright_text . "\n";
+		}
+
+		$output .= pixelgrade_get_footer_credits() . "\n";
+
+		$output .= "</div>\n";
 	}
 
-	echo apply_filters( 'pixelgrade_footer_the_copyright', $output );
+	echo apply_filters( 'pixelgrade_footer_the_copyright', $output ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 }
-
 /**
  * Get the footer copyright content (HTML or simple text).
- * It already has do_shortcode applied.
+ *
+ * It already has do_shortcode applied to it, so you don't have to.
  *
  * @return bool|string
  */
 function pixelgrade_footer_get_copyright_content() {
+	/* translators: %year%: current year  %site-title%: the site title */
 	$copyright_text = pixelgrade_option( 'copyright_text', esc_html__( '&copy; %year% %site-title%.', '__components_txtd' ) );
-
 	if ( ! empty( $copyright_text ) ) {
-		// We need to parse any tags present
+		// We need to parse any tags present.
 		$copyright_text = pixelgrade_parse_content_tags( $copyright_text );
-
-		// Finally process any shortcodes that might be in there
+		// Finally process any shortcodes that might be in there.
 		return do_shortcode( $copyright_text );
 	}
 
 	return '';
+}
+
+function pixelgrade_get_footer_credits() {
+	/* translators: 1: the original theme name 2: Pixelgrade site link */
+	return '<span class="c-footer__credits">' . sprintf( esc_html__( 'Theme: %1$s by %2$s.', '__components_txtd' ), esc_html( pixelgrade_get_original_theme_name() ), '<a href="' . esc_url( pixelgrade_get_footer_credits_url() ) . '" target="_blank">Pixelgrade</a>' ) . '</span>';
+}
+
+function pixelgrade_get_footer_credits_url() {
+	return apply_filters( 'pixelgrade_footer_credits_url', 'https://pixelgrade.com/' );
 }
 
 /**
@@ -246,10 +273,10 @@ function pixelgrade_footer_get_copyright_content() {
  * @return bool
  */
 function pixelgrade_footer_is_valid_config() {
-	// Get the component's configuration
+	// Get the component's configuration.
 	$config = Pixelgrade_Footer()->getConfig();
 
-	// Test if we have no zones or no sidebars and menu locations to show, even bogus ones
+	// Test if we have no zones or no sidebars and menu locations to show, even bogus ones.
 	if ( empty( $config['zones'] ) || ( empty( $config['menu_locations'] ) && empty( $config['sidebars'] ) ) ) {
 		return false;
 	}
@@ -264,16 +291,16 @@ function pixelgrade_footer_is_valid_config() {
  * @return array
  */
 function pixelgrade_footer_get_zones() {
-	// Get the component's configuration
+	// Get the component's configuration.
 	$config = Pixelgrade_Footer()->getConfig();
 
-	// Initialize the zones array with the configuration - we will build on it
+	// Initialize the zones array with the configuration - we will build on it.
 	$zones = $config['zones'];
 
-	// Cycle through each zone and determine the sidebars or nav menu locations that will be shown - with input from others
+	// Cycle through each zone and determine the sidebars or nav menu locations that will be shown - with input from others.
 	foreach ( $zones as $zone_id => $zone_settings ) {
 		$zones[ $zone_id ]['sidebars'] = array();
-		// Cycle through each defined sidebar and determine if it is a part of the current zone
+		// Cycle through each defined sidebar and determine if it is a part of the current zone.
 		foreach ( $config['sidebars'] as $sidebar_id => $sidebar ) {
 			// A little sanity check
 			if ( empty( $sidebar['default_zone'] ) ) {
@@ -329,7 +356,7 @@ function pixelgrade_footer_get_zones() {
 			$zones[ $zone_id ]['classes'] = array();
 		}
 
-		$default_classes              = array( 'c-footer__zone', 'c-footer__zone--' . $zone_id );
+		$default_classes              = array( 'c-footer__zone', 'c-footer__zone--' . sanitize_html_class( $zone_id ) );
 		$zones[ $zone_id ]['classes'] = array_merge( $default_classes, $zone_settings['classes'] );
 	}
 

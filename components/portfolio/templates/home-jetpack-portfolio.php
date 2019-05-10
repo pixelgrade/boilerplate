@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * The template for displaying the home for portfolio (page for projects).
  *
  * @link https://codex.wordpress.org/Template_Hierarchy
@@ -15,9 +14,9 @@
  * the readme will list any important changes.
  *
  * @see        https://pixelgrade.com
- * @author        Pixelgrade
+ * @author     Pixelgrade
  * @package    Components/Portfolio
- * @version     1.0.0
+ * @version    1.0.0
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -68,7 +67,7 @@ do_action( 'pixelgrade_before_primary_wrapper', $location );
 					<!-- pixelgrade_before_entry_title -->
 
 					<header class="entry-header c-page-header">
-						<h1 class="entry-title"><?php echo get_the_title( pixelgrade_get_page_for_projects() ); ?></h1>
+						<h1 class="entry-title"><?php echo wp_kses( get_the_title( pixelgrade_get_page_for_projects() ), wp_kses_allowed_html() ); ?></h1>
 						<?php pixelgrade_the_taxonomy_dropdown( Jetpack_Portfolio::CUSTOM_TAXONOMY_TYPE ); ?>
 					</header><!-- .entry-header.c-page-header -->
 

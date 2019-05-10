@@ -14,7 +14,7 @@
  * @see        https://pixelgrade.com
  * @author     Pixelgrade
  * @package    Components/Header
- * @version    1.0.1
+ * @version    1.0.0
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -25,6 +25,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 <div <?php pixelgrade_css_class( 'header nav', 'header navbar zone branding wrapper' ); ?>>
 
 	<div class="c-branding">
+
+		<?php do_action( 'pixelgrade_header_before_brading_content', 'header' ); ?>
 
 		<?php if ( has_custom_logo() || pixelgrade_has_custom_logo_transparent() ) { ?>
 
@@ -44,7 +46,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 		<?php } ?>
 
-		<a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home">
+		<?php do_action( 'pixelgrade_header_after_logo', 'header' ); ?>
+
+		<a class="c-logo__title" href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home">
 			<?php if ( is_front_page() || is_home() ) : ?>
 				<h1 class="site-title"><?php bloginfo( 'name' ); ?></h1>
 			<?php else : ?>
@@ -52,7 +56,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<?php endif; ?>
 		</a>
 
-		<p class="site-description site-description-text"><?php bloginfo( 'description' ); /* WPCS: xss ok. */ ?></p>
+		<p class="site-description site-description-text"><?php bloginfo( 'description' ); ?></p>
+
+		<?php do_action( 'pixelgrade_header_after_brading_content', 'header' ); ?>
 
 	</div><!-- .c-branding -->
 

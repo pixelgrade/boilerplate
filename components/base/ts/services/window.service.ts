@@ -1,23 +1,24 @@
-import * as Rx from 'rx-dom';
 import $ from 'jquery';
+
+import { Observable, fromEvent } from 'rxjs';
 
 export class WindowService {
 
-  private static $window: JQuery = $( window );
+  private static $window: JQuery<Window> = $( window );
 
-  public static onLoad(): Rx.Observable<UIEvent> {
-    return Rx.DOM.fromEvent( this.getWindowEl(), 'load' );
+  public static onLoad(): Observable<Event> {
+    return fromEvent( window, 'load' );
   }
 
-  public static onResize(): Rx.Observable<UIEvent> {
-    return Rx.DOM.resize( this.getWindowEl() );
+  public static onResize(): Observable<Event> {
+    return fromEvent( window, 'resize');
   }
 
-  public static onScroll(): Rx.Observable<UIEvent> {
-    return Rx.DOM.scroll( this.getWindowEl() );
+  public static onScroll(): Observable<Event> {
+    return fromEvent( window, 'scroll');
   }
 
-  public static getWindow(): JQuery {
+  public static getWindow(): JQuery<Window> {
     return WindowService.$window;
   }
 
@@ -33,8 +34,8 @@ export class WindowService {
     return WindowService.$window.height();
   }
 
-  public static getWindowEl(): Element {
-    return WindowService.$window[ 0 ];
+  public static getWindowEl(): Window {
+    return WindowService.$window[0];
   }
 
   public static getOrientation(): string {

@@ -22,6 +22,7 @@
  * @version    1.0.0
  */
 
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
@@ -39,15 +40,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 <body <?php body_class(); ?> <?php pixelgrade_body_attributes(); ?>>
 
 <?php
+// Fire up the WordPress 5.2+ action designed to provide a standardized way to output things after <body> open.
+// @see https://make.wordpress.org/themes/2019/03/29/addition-of-new-wp_body_open-hook/
+do_action( 'wp_body_open' ); ?>
+
+<?php
 /**
  * pixelgrade_after_body_open hook.
  *
  * @hooked nothing() - 10 (outputs nothings)
  */
 do_action( 'pixelgrade_after_body_open', 'main' );
-?>
 
-<?php
 /**
  * pixelgrade_before_barba_wrapper hook.
  *
@@ -61,32 +65,12 @@ do_action( 'pixelgrade_before_barba_wrapper', 'main' );
 
 	<?php
 	/**
-	 * pixelgrade_before_header hook.
-	 *
-	 * @hooked nothing() - 10 (outputs nothing)
-	 */
-	do_action( 'pixelgrade_before_header', 'main' );
-	?>
-
-	<?php
-	/**
 	 * pixelgrade_header hook.
 	 *
 	 * @hooked pixelgrade_the_header() - 10 (outputs the header markup)
 	 */
 	do_action( 'pixelgrade_header', 'main' );
-	?>
 
-	<?php
-	/**
-	 * pixelgrade_after_header hook.
-	 *
-	 * @hooked nothing() - 10 (outputs nothing)
-	 */
-	do_action( 'pixelgrade_after_header', 'main' );
-	?>
-
-	<?php
 	/**
 	 * pixelgrade_before_barba_container hook.
 	 *

@@ -5,8 +5,7 @@
  *
  * @see         https://pixelgrade.com
  * @author      Pixelgrade
- * @package     Components
- * @version     1.0.6
+ * @package     Components/Base
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -36,7 +35,7 @@ function typeline_get_theme_config( $path = '' ) {
 	}
 
 	// Read the theme's config file - it contains a variable $typeline_config
-	include $path;
+	include $path; // phpcs:ignore
 	// If for some reason the file doesn't contain the variable, bail
 	if ( ! isset( $typeline_config ) ) {
 		return false;
@@ -89,10 +88,8 @@ function typeline_get_y( $x, $points ) {
  * @return string
  */
 function typeline_negative_value_cb( $value, $selector, $property, $unit ) {
-	$output  = '';
-	$output .= $selector . ' {' . PHP_EOL .
-			$property . ': ' . ( - 1 * $value ) . $unit . ';' . PHP_EOL .
-			'}' . PHP_EOL;
+
+	$output = $selector . ' { ' . $property . ': ' . ( - 1 * $value ) . $unit . '; }';
 
 	return $output;
 }
@@ -102,7 +99,8 @@ function typeline_negative_value_cb( $value, $selector, $property, $unit ) {
  */
 function typeline_negative_value_cb_customizer_preview() {
 
-	$js = "function typeline_negative_value_cb( value, selector, property, unit ) {
+	$js = "
+function typeline_negative_value_cb( value, selector, property, unit ) {
 
     var css = '',
         style = document.getElementById('typeline_negative_value_style_tag'),
@@ -127,7 +125,8 @@ function typeline_negative_value_cb_customizer_preview() {
 
         head.appendChild(style);
     }
-}" . PHP_EOL;
+}
+";
 
 	wp_add_inline_script( 'customify-previewer-scripts', $js );
 
@@ -152,9 +151,11 @@ function typeline_spacing_cb( $value, $selector, $property, $unit ) {
 		$value = 0;
 	}
 
-	$output .= $selector . ' {' . PHP_EOL .
-			$property . ': ' . $value . $unit . ';' . PHP_EOL .
-			'}' . PHP_EOL;
+	$output .= '
+	' . $selector . ' {
+		' . $property . ': ' . $value . $unit . ';
+	}
+	';
 
 	// Get the Typeline configuration for this theme
 	$typeline_config = typeline_get_theme_config();
@@ -167,11 +168,13 @@ function typeline_spacing_cb( $value, $selector, $property, $unit ) {
 		for ( $i = 0; $i < $no_breakpoints; $i ++ ) {
 			$ratio     = ( typeline_get_y( $value, $points ) - 1 ) * ( $i + 1 ) / $no_breakpoints + 1;
 			$new_value = round( $value / $ratio );
-			$output   .= '@media only screen and (max-width: ' . $breakpoints[ $i ] . ') {' . PHP_EOL .
-					$selector . ' {' . PHP_EOL .
-					$property . ': ' . $new_value . $unit . ';' . PHP_EOL .
-					'}' . PHP_EOL .
-					'}' . PHP_EOL;
+			$output   .= '
+			@media only screen and (max-width: ' . $breakpoints[ $i ] . ') {
+				' . $selector . ' {
+					' . $property . ': ' . $new_value . $unit . ';
+				}
+			}
+			';
 		}
 	}
 
@@ -204,18 +207,20 @@ function getY( x ) {
     } else {
         return (points[1][1] + (points[2][1] - points[1][1]) * (x - points[1][0]) / (points[2][0] - points[1][0]));
     }
-}' . PHP_EOL;
+}
+';
 	}
 
 	$js .= "
 function typeline_spacing_cb( value, selector, property, unit ) {
     var css = '',
-        style = document.getElementById('typeline_range_negative_style_tag'),
+        style = document.getElementById('typeline_range_style_tag'),
         head = document.head || document.getElementsByTagName('head')[0];
 
     css += selector + ' {' +
         property + ': ' + value + unit + ';' +
-        '}';" . PHP_EOL;
+        '}';
+        ";
 
 	if ( ! empty( $typeline_config['spacings']['points'] ) && ! empty( $typeline_config['spacings']['breakpoints'] ) ) {
 
@@ -229,7 +234,8 @@ function typeline_spacing_cb( value, selector, property, unit ) {
 	        property + ': ' + newValue + unit + ';' +
 	        '}' +
 	        '}';
-	}" . PHP_EOL;
+	}
+	";
 	}
 
 	$js .= "
@@ -237,7 +243,7 @@ function typeline_spacing_cb( value, selector, property, unit ) {
 	        style.innerHTML = css;
     } else {
         style = document.createElement('style');
-        style.setAttribute('id', 'typeline_range_negative_style_tag');
+        style.setAttribute('id', 'typeline_range_style_tag');
 
         style.type = 'text/css';
         if ( style.styleSheet ) {
@@ -248,7 +254,8 @@ function typeline_spacing_cb( value, selector, property, unit ) {
 
         head.appendChild(style);
     }
-}" . PHP_EOL;
+}
+";
 
 	wp_add_inline_script( 'customify-previewer-scripts', $js );
 }
@@ -265,10 +272,12 @@ add_action( 'customize_preview_init', 'typeline_spacing_cb_customizer_preview', 
  * @return string
  */
 function typeline_negative_spacing_cb( $value, $selector, $property, $unit ) {
-	$output  = '';
-	$output .= $selector . ' {' . PHP_EOL .
-			$property . ': ' . - 1 * $value . $unit . ';' . PHP_EOL .
-			'}' . PHP_EOL;
+
+	$output = '
+	' . $selector . ' {
+		' . $property . ': ' . - 1 * $value . $unit . ';
+	}
+	';
 
 	// Get the Typeline configuration for this theme
 	$typeline_config = typeline_get_theme_config();
@@ -281,11 +290,13 @@ function typeline_negative_spacing_cb( $value, $selector, $property, $unit ) {
 			$ratio     = ( typeline_get_y( $value, $points ) - 1 ) * ( $i + 1 ) / $no_breakpoints + 1;
 			$new_value = round( $value / $ratio );
 
-			$output .= '@media only screen and (max-width: ' . $breakpoints[ $i ] . ') {' . PHP_EOL .
-					$selector . ' {' . PHP_EOL .
-					$property . ': ' . - 1 * $new_value . $unit . ';' . PHP_EOL .
-					'}' . PHP_EOL .
-					'}' . PHP_EOL;
+			$output .= '
+			@media only screen and (max-width: ' . $breakpoints[ $i ] . ') {
+				' . $selector . ' {
+					' . $property . ': ' . - 1 * $new_value . $unit . ';
+				}
+			}
+			';
 		}
 	}
 
@@ -319,7 +330,8 @@ function getY( x ) {
 	} else {
 		return (points[1][1] + (points[2][1] - points[1][1]) * (x - points[1][0]) / (points[2][0] - points[1][0]));
 	}
-}' . PHP_EOL;
+}
+';
 
 	}
 
@@ -332,7 +344,8 @@ function typeline_negative_spacing_cb( value, selector, property, unit ) {
 
 	css += selector + ' {' +
 	       property + ': ' + -1 * value + unit + ';' +
-	       '}';" . PHP_EOL;
+	       '}';
+	       ";
 
 	if ( ! empty( $typeline_config['spacings']['points'] ) && ! empty( $typeline_config['spacings']['breakpoints'] ) ) {
 
@@ -346,7 +359,8 @@ function typeline_negative_spacing_cb( value, selector, property, unit ) {
 		       property + ': ' + -1 * newValue + unit + ';' +
 		       '}' +
 		       '}';
-	}" . PHP_EOL;
+	}
+	";
 
 	}
 
@@ -366,7 +380,8 @@ function typeline_negative_spacing_cb( value, selector, property, unit ) {
 
 		head.appendChild(style);
 	}
-}" . PHP_EOL;
+}
+";
 
 	wp_add_inline_script( 'customify-previewer-scripts', $js );
 }
@@ -381,6 +396,12 @@ add_action( 'customize_preview_init', 'typeline_negative_spacing_cb_customizer_p
  * @return string
  */
 function typeline_font_cb( $value, $font ) {
+
+	// Standardize font_size value
+	if ( ! empty( $value['font_size']['value'] ) ) {
+		$value['font_size'] = $value['font_size']['value'];
+	}
+
 	// Account for fonts with multiple variants
 	if ( empty( $value['font_weight'] ) && ! empty( $value['selected_variants'] ) ) {
 		$value['font_weight'] = $value['selected_variants'];
@@ -442,7 +463,7 @@ function typeline_font_cb( $value, $font ) {
 	}
 
 	// close up the CSS rules for this font
-	$output .= '}' . PHP_EOL;
+	$output .= "}\n";
 
 	// Get the Typeline configuration for this theme
 	$typeline_config = typeline_get_theme_config();
@@ -456,7 +477,7 @@ function typeline_font_cb( $value, $font ) {
 			$ratio     = ( typeline_get_y( $value['font_size'], $points ) - 1 ) * ( $i + 1 ) / $no_breakpoints + 1;
 			$new_value = round( $value['font_size'] / $ratio );
 
-			$output .= '@media only screen and (max-width: ' . $breakpoints[ $i ] . ') {' . $font['selector'] . ' { font-size: ' . $new_value . $font['fields']['font-size']['unit'] . '; } }' . PHP_EOL;
+			$output .= '@media only screen and (max-width: ' . $breakpoints[ $i ] . ') {' . $font['selector'] . ' { font-size: ' . $new_value . $font['fields']['font-size']['unit'] . "; } }\n";
 		}
 	}
 
@@ -489,7 +510,8 @@ function typeline_font_cb_customizer_preview() {
 		} else {
 			return (points[1][1] + (points[2][1] - points[1][1]) * (x - points[1][0]) / (points[2][0] - points[1][0]));
 		}
-	}' . PHP_EOL;
+	}
+	';
 	}
 
 	$js .= "
@@ -502,7 +524,8 @@ function typeline_font_cb(values, font) {
 		css += property + ': ' + value + ';';
 	});
 
-	css += '}';" . PHP_EOL;
+	css += '}';
+	";
 
 	if ( ! empty( $typeline_config['typography']['points'] ) && ! empty( $typeline_config['typography']['breakpoints'] ) ) {
 
@@ -515,13 +538,176 @@ function typeline_font_cb(values, font) {
 		css += '@media only screen and (max-width: ' + parseInt(breakpoints[i], 10) + 'px) {' +
 				font['selector'] + ' {' + 'font-size: ' + newValue + font['fields']['font-size']['unit'] + ';' + '}' +
 			'}\\n';
-	}" . PHP_EOL;
+	}
+	";
 	}
 
 		$js .= '
 	return css;
-}' . PHP_EOL;
+}
+';
 
 	wp_add_inline_script( 'customify-previewer-scripts', $js );
 }
 add_action( 'customize_preview_init', 'typeline_font_cb_customizer_preview', 20 );
+
+
+/**
+ * Returns the custom CSS rules for the fonts depending on the Customizer settings.
+ *
+ * @param $value
+ * @param $font
+ *
+ * @return string
+ */
+function typeline_body_font_cb( $value, $font ) {
+	// Account for fonts with multiple variants
+	if ( empty( $value['font_weight'] ) && ! empty( $value['selected_variants'] ) ) {
+		$value['font_weight'] = $value['selected_variants'];
+	}
+
+	// Gather the CSS rules starting with the selector
+	$output = $font['selector'] . ' { ';
+
+	if ( ! empty( $value['font_family'] ) ) {
+		$output .= 'font-family: ' . $value['font_family'] . '; ';
+	}
+
+	if ( ! empty( $value['font_size'] ) ) {
+		$size_unit = 'px';
+		if ( ! empty( $font['fields']['font-size']['unit'] ) ) {
+			$size_unit = $font['fields']['font-size']['unit'];
+		}
+
+		$output .= 'font-size: ' . $value['font_size'] . $size_unit . '; ';
+	}
+
+	// the font weight may also hold the italic style property, so it needs some extra care
+	if ( ! empty( $value['font_weight'] ) ) {
+
+		// determine if this is an italic font (the google fonts weight is usually like '400' or '400italic' )
+		if ( strpos( $value['font_weight'], 'italic' ) !== false ) {
+			$value['font_weight'] = str_replace( 'italic', '', $value['font_weight'] );
+			$value['font_style']  = 'italic';
+		}
+
+		if ( ! empty( $value['font_weight'] ) ) {
+			// a little bit of sanity check - in case it's not a number
+			if ( 'regular' === $value['font_weight'] ) {
+				$value['font_weight'] = 'normal';
+			}
+		}
+
+		$output .= 'font-weight: ' . $value['font_weight'] . ';';
+	}
+
+	if ( ! empty( $value['font_style'] ) ) {
+		$output .= 'font-style: ' . $value['font_style'] . ';';
+	}
+
+	if ( isset( $value['line_height'] ) ) {
+		$output .= 'line-height: ' . $value['line_height'] . ';';
+	}
+
+	if ( isset( $value['letter_spacing'] ) ) {
+		$letter_spacing_unit = 'em';
+		if ( ! empty( $font['fields']['letter-spacing']['unit'] ) ) {
+			$letter_spacing_unit = $font['fields']['letter-spacing']['unit'];
+		}
+		$output .= 'letter-spacing: ' . $value['letter_spacing'] . $letter_spacing_unit . '; ';
+	}
+
+	if ( ! empty( $value['text_transform'] ) ) {
+		$output .= 'text-transform: ' . $value['text_transform'] . ';';
+	}
+
+	// close up the CSS rules for this font
+	$output .= "}\n";
+
+	// Get the Typeline configuration for this theme
+	$typeline_config = typeline_get_theme_config();
+
+	// Some sanity check before processing the config
+	if ( ! empty( $typeline_config['body_type']['points'] ) && ! empty( $typeline_config['body_type']['breakpoints'] ) ) {
+		$points         = $typeline_config['body_type']['points'];
+		$breakpoints    = $typeline_config['body_type']['breakpoints'];
+		$no_breakpoints = count( $breakpoints );
+		for ( $i = 0; $i < $no_breakpoints; $i ++ ) {
+			$ratio     = ( typeline_get_y( $value['font_size'], $points ) - 1 ) * ( $i + 1 ) / $no_breakpoints + 1;
+			$new_value = round( $value['font_size'] / $ratio );
+
+			$output .= '@media only screen and (max-width: ' . $breakpoints[ $i ] . ') {' . $font['selector'] . ' { font-size: ' . $new_value . $font['fields']['font-size']['unit'] . "; } }\n";
+		}
+	}
+
+	return $output;
+}
+
+/**
+ * Inline enqueues the JS code used in the Customizer for the font live preview.
+ */
+function typeline_body_font_cb_customizer_preview() {
+	$js = '';
+
+	// Get the Typeline configuration for this theme
+	$typeline_config = typeline_get_theme_config();
+
+	// Some sanity check before processing the config
+	// There is no need for this code since we have nothing to work with
+	if ( ! empty( $typeline_config['body_type']['points'] ) && ! empty( $typeline_config['body_type']['breakpoints'] ) ) {
+		$points      = $typeline_config['body_type']['points'];
+		$breakpoints = $typeline_config['body_type']['breakpoints'];
+
+		$js .= 'var points = [[' . $points[0][0] . ', ' . $points[0][1] . '], [' . $points[1][0] . ', ' . $points[1][1] . '], [' . $points[2][0] . ', ' . $points[2][1] . ']],
+	breakpoints = ["' . $breakpoints[0] . '"' . ( isset($breakpoints[1]) ? ', "' . $breakpoints[1] . '"' : '' ) . ( isset( $breakpoints[2] ) ? ', "' . $breakpoints[2] . '"' : '' ) . '];
+
+	function getY(x) {
+		if (x < points[1][0]) {
+			var a = points[0][1],
+				b = (points[1][1] - points[0][1]) / Math.pow(points[1][0], 3);
+			return a + b * Math.pow(x, 3);
+		} else {
+			return (points[1][1] + (points[2][1] - points[1][1]) * (x - points[1][0]) / (points[2][0] - points[1][0]));
+		}
+	}
+	';
+	}
+
+	$js .= "
+function typeline_body_font_cb(values, font) {
+	var css = font['selector'] + ' {';
+
+	// Customify is already checking values for us
+	Object.keys(values).map(function(property, index) {
+		var value = values[property];
+		css += property + ': ' + value + ';';
+	});
+
+	css += '}';
+	";
+
+	if ( ! empty( $typeline_config['body_type']['points'] ) && ! empty( $typeline_config['body_type']['breakpoints'] ) ) {
+
+		$js .= "
+	for (var i = 0; i <= breakpoints.length - 1; i++) {
+		var oldValue = parseInt(values['font-size'], 10),
+			newRatio = (getY(oldValue) - 1) * (i + 1) / breakpoints.length + 1,
+			newValue = Math.round(oldValue / newRatio);
+
+		css += '@media only screen and (max-width: ' + parseInt(breakpoints[i], 10) + 'px) {' +
+				font['selector'] + ' {' + 'font-size: ' + newValue + font['fields']['font-size']['unit'] + ';' + '}' +
+			'}\\n';
+	}
+	";
+
+	}
+
+	$js .= '
+	return css;
+}
+';
+
+	wp_add_inline_script( 'customify-previewer-scripts', $js );
+}
+add_action( 'customize_preview_init', 'typeline_body_font_cb_customizer_preview', 20 );
+

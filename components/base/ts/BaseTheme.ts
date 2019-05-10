@@ -3,19 +3,22 @@ import $ from 'jquery';
 import { Helper } from './services/Helper';
 import { WindowService } from './services/window.service';
 import { GlobalService } from './services/global.service';
+import { take, debounceTime } from 'rxjs/operators';
 
 export interface JQueryExtended extends JQuery {
   imagesLoaded?( params: any );
   masonry?( options?: any, elements?: any, isStill?: boolean );
   select2?( params?: any );
   slick?( params?: any );
+  splice?( start?: any, end?: any );
 }
 
 export class BaseTheme {
 
   public $body: JQuery = $( 'body' );
+  public $window: JQuery<Window> = $( window );
   public $html: JQuery = $( 'html' );
-  public ev: JQuery = $( {} );
+  public ev: JQuery<HTMLElement> = $();
   public frameRendered: boolean = false;
 
   public subscriptionActive: boolean = true;
@@ -28,9 +31,9 @@ export class BaseTheme {
   }
 
   public bindEvents(): void {
-    GlobalService.onReady().take(1).subscribe(this.onReadyAction.bind(this));
-    WindowService.onLoad().take(1).subscribe(this.onLoadAction.bind(this));
-    WindowService.onResize().debounce(500).subscribe(this.onResizeAction.bind(this));
+    GlobalService.onReady().pipe(take(1)).subscribe(this.onReadyAction.bind(this));
+    WindowService.onLoad().pipe(take(1)).subscribe(this.onLoadAction.bind(this));
+    WindowService.onResize().pipe(debounceTime(500)).subscribe(this.onResizeAction.bind(this));
     WindowService.onScroll().subscribe(this.onScrollAction.bind(this));
 
     // Leave comments area visible by default and
@@ -38,7 +41,7 @@ export class BaseTheme {
     if ( window.location.href.indexOf( '#comment' ) === -1 ) {
       $( '.trigger-comments' ).removeAttr( 'checked' );
     }
-    $( window ).on( 'beforeunload', this.fadeOut.bind(this) );
+    this.$window.on( 'beforeunload', this.fadeOut.bind(this) );
 
     this.ev.on( 'render', this.update.bind(this) );
   }

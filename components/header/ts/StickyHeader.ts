@@ -1,10 +1,11 @@
 import $ from 'jquery';
-import * as imagesLoaded from 'imagesloaded';
 import 'jquery-hoverintent';
 import { BaseComponent } from '../../base/ts/models/DefaultComponent';
 import { ProgressBar } from '../../base/ts/components/ProgressBar';
 import { WindowService } from '../../base/ts/services/window.service';
 import { Helper } from '../../base/ts/services/Helper';
+
+import { takeWhile, map } from 'rxjs/operators';
 
 interface JQueryExtended extends JQuery {
   hoverIntent?( params: any ): void;
@@ -15,8 +16,9 @@ export class StickyHeader extends BaseComponent {
 
   private ProgressBar: ProgressBar;
   private $body: JQuery = $( 'body' );
-  private $document: JQuery = $( document );
+  private $document: JQuery<Document> = $( document );
   private $mainMenu: JQuery = $( '.menu--primary' );
+  private $secondaryMenu: JQuery = $( '.menu--secondary' );
   private $mainMenuItems: JQueryExtended = this.$mainMenu.find( 'li' );
   private $readingBar: JQuery = $( '.js-reading-bar' );
   private $stickyHeader: JQuery = $( '.js-site-header-sticky' );
@@ -39,7 +41,7 @@ export class StickyHeader extends BaseComponent {
   constructor() {
     super();
 
-    imagesLoaded( $( '.c-navbar .c-logo' ), () => {
+    ( $( '.c-navbar .c-logo' ) as JQueryExtended ).imagesLoaded( () => {
 
       this.bindEvents();
       this.eventHandlers();
@@ -70,15 +72,15 @@ export class StickyHeader extends BaseComponent {
 
     WindowService
       .onScroll()
-      .takeWhile( () => this.subscriptionActive )
-      .map(() => WindowService.getScrollY())
+      .pipe( takeWhile( () => this.subscriptionActive ) )
+      .pipe( map(() => WindowService.getScrollY()) )
       .subscribe( (scrollPosition) => {
         this.refresh( scrollPosition );
       } );
 
     WindowService
       .onResize()
-      .takeWhile( () => this.subscriptionActive )
+      .pipe( takeWhile( () => this.subscriptionActive ) )
       .subscribe( () => {
         this.updateOnResize();
       } );
@@ -97,7 +99,7 @@ export class StickyHeader extends BaseComponent {
     }
   }
 
-  private onMobileMenuExpand(e: JQuery.Event): void {
+  private onMobileMenuExpand(e: Event): void {
     e.preventDefault();
     e.stopPropagation();
 
@@ -121,7 +123,7 @@ export class StickyHeader extends BaseComponent {
     $button.parent().addClass( hoverClass );
   }
 
-  private onMenuToggleChange( e: JQuery.Event ): void {
+  private onMenuToggleChange( e: Event ): void {
     const isMenuOpen = $( e.currentTarget ).prop( 'checked' );
     this.$body.toggleClass( 'nav--is-open', isMenuOpen );
     if ( !isMenuOpen ) {
@@ -133,7 +135,7 @@ export class StickyHeader extends BaseComponent {
     }
   }
 
-  private toggleSubMenu(e: JQuery.Event, toggle: boolean) {
+  private toggleSubMenu(e: Event, toggle: boolean) {
     $( e.currentTarget ).toggleClass( 'hover', toggle );
   }
 
@@ -169,6 +171,7 @@ export class StickyHeader extends BaseComponent {
     // Fallback to the other, secondary menu (top left one).
     if ( this.$mainMenu.length === 0 ) {
       this.$mainMenu = $( '.menu--secondary' );
+      this.$secondaryMenu = $();
     }
 
     // If there is a menu, either the "true" main one or the fallback one,
@@ -176,7 +179,13 @@ export class StickyHeader extends BaseComponent {
     if ( this.$mainMenu.length === 1 ) {
       this.$mainMenu = this.$mainMenu
         .clone( true, true )
-        .appendTo( this.$stickyHeader.find( '.c-navbar' ) );
+        .appendTo( this.$stickyHeader.find( '.c-navigation-bar__middle' ) );
+    }
+
+    if ( this.$secondaryMenu.length === 1 ) {
+      this.$secondaryMenu = this.$secondaryMenu
+          .clone( true, true )
+          .appendTo( this.$stickyHeader.find( '.c-navigation-bar__left' ) );
     }
 
     this.$stickyHeader
@@ -224,7 +233,7 @@ export class StickyHeader extends BaseComponent {
       } );
 
       // Replace the label text and make it visible
-      $( '.c-navbar__label-text ' ).html( $( '.js-menu-mobile-label' ).html() ).removeClass( 'screen-reader-text' );
+      $( '.c-navbar__label-text' ).html( $( '.js-menu-mobile-label' ).html() ).removeClass( 'screen-reader-text' );
 
       this.isMobileHeaderInitialised = true;
     }
@@ -237,7 +246,7 @@ export class StickyHeader extends BaseComponent {
 
     $( '.c-reading-bar__wrapper-social' ).find( '.share-end' ).remove();
 
-    const entryHeader = $( '.entry-header' );
+    const entryHeader = $( '.entry-header, .entry-summary' );
     const entryContent = $( '.single-main' ).find( '.entry-content' );
     const entryHeaderHeight = entryHeader.outerHeight() || 0;
     const entryContentHeight = entryContent.outerHeight() || 0;
@@ -328,10 +337,12 @@ export class StickyHeader extends BaseComponent {
           .appendTo( $headerSocialNavigation.find( '.menu' ) );
     } else {
       // Or directly to zone left if there is no social navigation
-      this.$searchTrigger.clone().appendTo( $( '.c-navbar__zone--left' ) );
+      this.$searchTrigger.clone().appendTo( '.c-navbar__zone--left' );
     }
 
-    this.$searchTrigger.clone().appendTo( $( '.site-header-sticky .c-navbar' ) );
+    this.$searchTrigger.clone()
+        .appendTo( '.c-navigation-bar__right' )
+        .find( '.screen-reader-text' ).removeClass( 'screen-reader-text' );
 
     this.$searchTrigger.remove();
   }

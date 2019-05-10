@@ -1,9 +1,10 @@
 import $ from 'jquery';
-import * as imagesLoaded from 'imagesloaded';
 import 'jquery-hoverintent';
 import { BaseComponent } from '../../base/ts/models/DefaultComponent';
 import { Helper } from '../../base/ts/services/Helper';
 import { WindowService } from '../../base/ts/services/window.service';
+
+import { takeWhile } from 'rxjs/operators';
 
 interface JQueryExtended extends JQuery {
   hoverIntent?( params: any ): void;
@@ -13,7 +14,7 @@ interface JQueryExtended extends JQuery {
 export class Header extends BaseComponent {
 
   private $body: JQuery = $( 'body' );
-  private $document: JQuery = $( document );
+  private $document: JQuery<Document> = $( document );
   private $mainMenu: JQuery = $( '.menu--primary' );
   private $mainMenuItems: JQueryExtended = this.$mainMenu.find( 'li' );
   private $menuToggle: JQuery = $( '#menu-toggle' );
@@ -38,7 +39,7 @@ export class Header extends BaseComponent {
       }
     });
 
-    imagesLoaded( $( '.c-navbar .c-logo' ), () => {
+    ( $( '.c-navbar .c-logo' ) as JQueryExtended ).imagesLoaded(() => {
 
       this.bindEvents();
       this.eventHandlers();
@@ -64,7 +65,7 @@ export class Header extends BaseComponent {
 
     WindowService
       .onResize()
-      .takeWhile( () => this.subscriptionActive )
+      .pipe( takeWhile( () => this.subscriptionActive ) )
       .subscribe( () => {
         this.updateOnResize();
       } );
@@ -133,11 +134,11 @@ export class Header extends BaseComponent {
     this.isMobileHeaderInitialised = true;
   }
 
-  private toggleSubMenu(e: JQuery.Event, toggle: boolean) {
+  private toggleSubMenu(e: Event, toggle: boolean) {
     $( e.currentTarget ).toggleClass( 'hover', toggle );
   }
 
-  private onMobileMenuExpand(e: JQuery.Event): void {
+  private onMobileMenuExpand(e: Event): void {
     e.preventDefault();
     e.stopPropagation();
 

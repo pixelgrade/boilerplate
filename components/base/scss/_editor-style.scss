@@ -1,4 +1,6 @@
 @import "tools/all";
+@import "mixins/all";
+
 @import "generic/normalize";
 @import "generic/reset";
 
@@ -8,8 +10,6 @@
     border: 0;
   }
 }
-
-@import "typography";
 
 @import "elements/two-column";
 

@@ -7,7 +7,6 @@
  * @see         https://pixelgrade.com
  * @author      Pixelgrade
  * @package     Components/Blog
- * @version     1.1.1
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -22,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 function pixelgrade_blog_grid_class( $class = '', $location = '' ) {
 	// Separates classes with a single space, collates classes
-	echo 'class="' . join( ' ', pixelgrade_get_blog_grid_class( $class, $location ) ) . '"';
+	echo 'class="' . esc_attr( join( ' ', pixelgrade_get_blog_grid_class( $class, $location ) ) ) . '"';
 }
 
 if ( ! function_exists( 'pixelgrade_get_blog_grid_class' ) ) {
@@ -84,7 +83,7 @@ if ( ! function_exists( 'pixelgrade_get_blog_grid_layout_class' ) ) {
 	 */
 	function pixelgrade_get_blog_grid_layout_class( $location = '' ) {
 		$grid_layout         = pixelgrade_option( 'blog_grid_layout', 'regular' );
-		$grid_layout_classes = array( 'c-gallery--' . $grid_layout );
+		$grid_layout_classes = array( 'c-gallery--' . sanitize_html_class( $grid_layout ) );
 
 		// For certain kind of layouts, we need to add extra classes
 		if ( in_array( $grid_layout, array( 'packed', 'regular', 'mosaic' ) ) ) {
@@ -114,9 +113,9 @@ if ( ! function_exists( 'pixelgrade_get_blog_grid_column_class' ) ) {
 
 		$column_classes   = array();
 		$column_classes[] = 'o-grid';
-		$column_classes[] = 'o-grid--' . $columns_at_desk . 'col-@desk';
-		$column_classes[] = 'o-grid--' . $columns_at_lap . 'col-@lap';
-		$column_classes[] = 'o-grid--' . $columns_at_small . 'col-@small';
+		$column_classes[] = 'o-grid--' . sanitize_html_class( $columns_at_desk ) . 'col-@desk';
+		$column_classes[] = 'o-grid--' . sanitize_html_class( $columns_at_lap ) . 'col-@lap';
+		$column_classes[] = 'o-grid--' . sanitize_html_class( $columns_at_small ) . 'col-@small';
 
 		return $column_classes;
 	}
@@ -133,12 +132,12 @@ if ( ! function_exists( 'pixelgrade_get_blog_grid_alignment_class' ) ) {
 	function pixelgrade_get_blog_grid_alignment_class( $location = '' ) {
 		// Title position
 		$title_position = pixelgrade_option( 'blog_items_title_position', 'regular' );
-		$title_classes  = array( 'c-gallery--title-' . $title_position );
+		$title_classes  = array( 'c-gallery--title-' . sanitize_html_class( $title_position ) );
 
 		if ( $title_position == 'overlay' ) {
-			$title_classes[] = 'c-gallery--title-' . pixelgrade_option( 'blog_items_title_alignment_overlay', 'bottom-left' );
+			$title_classes[] = 'c-gallery--title-' . sanitize_html_class( pixelgrade_option( 'blog_items_title_alignment_overlay', 'bottom-left' ) );
 		} else {
-			$title_classes[] = 'c-gallery--title-' . pixelgrade_option( 'blog_items_title_alignment_nearby', 'left' );
+			$title_classes[] = 'c-gallery--title-' . sanitize_html_class( pixelgrade_option( 'blog_items_title_alignment_nearby', 'left' ) );
 		}
 
 		return $title_classes;
@@ -146,7 +145,7 @@ if ( ! function_exists( 'pixelgrade_get_blog_grid_alignment_class' ) ) {
 }
 
 function pixelgrade_blog_grid_item_class( $class = '', $location = '' ) {
-	echo 'class="' . join( ' ', pixelgrade_get_blog_grid_item_class( $class, $location ) ) . '"';
+	echo 'class="' . esc_attr( join( ' ', pixelgrade_get_blog_grid_item_class( $class, $location ) ) ) . '"';
 }
 
 if ( ! function_exists( 'pixelgrade_get_blog_grid_item_class' ) ) {
@@ -156,7 +155,7 @@ if ( ! function_exists( 'pixelgrade_get_blog_grid_item_class' ) ) {
 		$classes[] = 'c-gallery__item';
 
 		if ( has_post_thumbnail() ) {
-			$classes[] = 'c-gallery__item--' . pixelgrade_get_image_aspect_ratio_type( get_post_thumbnail_id(), 'landscape' );
+			$classes[] = 'c-gallery__item--' . sanitize_html_class( pixelgrade_get_image_aspect_ratio_type( get_post_thumbnail_id(), 'landscape' ) );
 		} else {
 			$classes[] = 'c-gallery__item--no-image';
 		}
@@ -201,19 +200,19 @@ if ( ! function_exists( 'pixelgrade_get_post_meta' ) ) {
 						// If we are on a page then we only want the main category
 						$main_category = pixelgrade_get_main_category_link();
 						if ( ! empty( $main_category ) ) {
-							$category .= '<span class="screen-reader-text">' . esc_html__( 'Main Category', '__components_txtd' ) . '</span><ul>' . PHP_EOL;
-							$category .= '<li>' . $main_category . '</li>' . PHP_EOL;
-							$category .= '</ul>' . PHP_EOL;
+							$category .= '<span class="screen-reader-text">' . esc_html__( 'Main Category', '__components_txtd' ) . "</span><ul>\n";
+							$category .= '<li>' . $main_category . "</li>\n";
+							$category .= "</ul>\n";
 						}
 					} else {
 						// On archives we want to show all the categories, not just the main one
 						$categories = get_the_terms( get_the_ID(), 'category' );
 						if ( ! is_wp_error( $categories ) && ! empty( $categories ) ) {
-							$category .= '<span class="screen-reader-text">' . esc_html__( 'Categories', '__components_txtd' ) . '</span><ul>' . PHP_EOL;
+							$category .= '<span class="screen-reader-text">' . esc_html__( 'Categories', '__components_txtd' ) . "</span><ul>\n";
 							foreach ( $categories as $this_category ) {
-								$category .= '<li><a href="' . esc_url( get_category_link( $this_category ) ) . '" rel="category">' . $this_category->name . '</a></li>' . PHP_EOL;
+								$category .= '<li><a href="' . esc_url( get_category_link( $this_category ) ) . '" rel="category">' . $this_category->name . "</a></li>\n";
 							};
-							$category .= '</ul>' . PHP_EOL;
+							$category .= "</ul>\n";
 						}
 					}
 					$meta['category'] = $category;
@@ -222,11 +221,11 @@ if ( ! function_exists( 'pixelgrade_get_post_meta' ) ) {
 					$post_tags = get_the_terms( get_the_ID(), 'post_tag' );
 					$tags      = '';
 					if ( ! is_wp_error( $post_tags ) && ! empty( $post_tags ) ) {
-						$tags .= '<span class="screen-reader-text">' . esc_html__( 'Tags', '__components_txtd' ) . '</span><ul>' . PHP_EOL;
+						$tags .= '<span class="screen-reader-text">' . esc_html__( 'Tags', '__components_txtd' ) . "</span><ul>\n";
 						foreach ( $post_tags as $post_tag ) {
-							$tags .= '<li><a href="' . esc_url( get_term_link( $post_tag ) ) . '" rel="tag">' . $post_tag->name . '</a></li>' . PHP_EOL;
+							$tags .= '<li><a href="' . esc_url( get_term_link( $post_tag ) ) . '" rel="tag">' . $post_tag->name . "</a></li>\n";
 						};
-						$tags .= '</ul>' . PHP_EOL;
+						$tags .= "</ul>\n";
 					}
 					$meta['tags'] = $tags;
 					break;
@@ -242,6 +241,7 @@ if ( ! function_exists( 'pixelgrade_get_post_meta' ) ) {
 						if ( $comments_number == 0 ) {
 							$comments = esc_html__( 'No Comments', '__components_txtd' );
 						} else {
+							/* translators: %d: the number of comments */
 							$comments = sprintf( _n( '%d Comment', '%d Comments', $comments_number, '__components_txtd' ), $comments_number );
 						}
 						$meta['comments'] = '<a href="' . esc_url( get_comments_link() ) . '">' . esc_html( $comments ) . '</a>';
@@ -272,9 +272,14 @@ if ( ! function_exists( 'pixelgrade_get_post_meta' ) ) {
  *
  * @param array $args Optional. See get_the_post_navigation() for available arguments.
  *                    Default empty array.
+ * @return void
  */
 function pixelgrade_the_post_navigation( $args = array() ) {
-	echo pixelgrade_get_the_post_navigation( $args );
+    if ( true === apply_filters( 'pixelgrade_prevent_post_navigation', false ) ) {
+        return;
+    }
+
+	echo pixelgrade_get_the_post_navigation( $args ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 }
 
 if ( ! function_exists( 'pixelgrade_get_the_post_navigation' ) ) {
@@ -328,7 +333,7 @@ if ( ! function_exists( 'pixelgrade_get_the_post_navigation' ) ) {
 			$navigation = _navigation_markup( $previous . $next, 'post-navigation', $args['screen_reader_text'] );
 		}
 
-		return $navigation;
+		return apply_filters( 'pixelgrade_get_the_post_navigation', $navigation, $args );
 	}
 }
 
@@ -336,7 +341,9 @@ if ( ! function_exists( 'pixelgrade_get_the_post_navigation' ) ) {
  * Display the HTML of the author info box
  */
 function pixelgrade_the_author_info_box() {
-	echo pixelgrade_get_the_author_info_box();
+	if ( pixelgrade_user_has_access( 'pro-features' ) ) {
+		echo pixelgrade_get_the_author_info_box(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	}
 }
 
 if ( ! function_exists( 'pixelgrade_get_the_author_info_box' ) ) {
@@ -406,7 +413,7 @@ if ( ! function_exists( 'pixelgrade_get_the_author_info_box' ) ) {
 		$author_details .= '<div class="c-author__details">';
 
 		if ( ! empty( $display_name ) ) {
-			$author_details .= '<span class="c-author__name h3">' . $display_name . '</span>';
+			$author_details .= '<span class="c-author__name h3">' . esc_html( $display_name ) . '</span>';
 		}
 
 		// The author bio
@@ -450,22 +457,23 @@ if ( ! function_exists( 'pixelgrade_get_author_bio_links' ) ) {
 		$str     = wp_remote_fopen( 'https://www.gravatar.com/' . md5( strtolower( trim( get_the_author_meta( 'user_email' ) ) ) ) . '.php' );
 		$profile = unserialize( $str );
 
-		$markup .= '<span class="c-author__links">' . PHP_EOL;
+		$markup .= "<span class=\"c-author__links\">\n";
 
-		$markup .= '<a class="c-author__social-link  c-author__website-link" href="' . esc_url( $user_posts ) . '" rel="author" title="' . esc_attr( sprintf( __( 'View all posts by %s', '__components_txtd' ), get_the_author() ) ) . '">' . esc_html__( 'All posts', '__components_txtd' ) . '</a>';
+		/* translators: %s: the author name */
+		$markup .= '<a class="c-author__social-link  c-author__website-link h5" href="' . esc_url( $user_posts ) . '" rel="author" title="' . esc_attr( sprintf( esc_html__( 'View all posts by %s', '__components_txtd' ), get_the_author() ) ) . '">' . esc_html__( 'All posts', '__components_txtd' ) . '</a>';
 
 		if ( is_array( $profile ) && ! empty( $profile['entry'][0]['urls'] ) ) {
 			foreach ( $profile['entry'][0]['urls'] as $link ) {
 				if ( ! empty( $link['value'] ) && ! empty( $link['title'] ) ) {
-					$markup .= '<a class="c-author__social-link" href="' . esc_url( $link['value'] ) . '" target="_blank">' . $link['title'] . '</a>' . PHP_EOL;
+					$markup .= '<a class="c-author__social-link h5" href="' . esc_url( $link['value'] ) . '" target="_blank">' . $link['title'] . "</a>\n";
 				}
 			}
 		}
 
 		if ( ! empty( $user_website ) ) {
-			$markup .= '<a class="c-author__social-link" href="' . esc_url( $user_website ) . '" target="_blank">' . esc_html__( 'Website', '__components_txtd' ) . '</a>' . PHP_EOL;
+			$markup .= '<a class="c-author__social-link h5" href="' . esc_url( $user_website ) . '" target="_blank">' . esc_html__( 'Website', '__components_txtd' ) . "</a>\n";
 		}
-		$markup .= '</span>' . PHP_EOL;
+		$markup .= "</span>\n";
 
 		return $markup;
 	} // function
@@ -559,7 +567,7 @@ function pixelgrade_get_main_category( $post_ID = null ) {
  * @param string $category_class Optional. A CSS class that the category will receive.
  */
 function pixelgrade_the_main_category_link( $before = '', $after = '', $category_class = '' ) {
-	echo pixelgrade_get_main_category_link( $before, $after, $category_class );
+	echo pixelgrade_get_main_category_link( $before, $after, $category_class ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
 } // function
 
@@ -585,7 +593,7 @@ if ( ! function_exists( 'pixelgrade_get_main_category_link' ) ) {
 		$class_markup = '';
 
 		if ( ! empty( $category_class ) ) {
-			$class_markup = 'class="' . $category_class . '" ';
+			$class_markup = 'class="' . esc_attr( $category_class ) . '" ';
 		}
 		return $before . '<a ' . $class_markup . ' href="' . esc_url( get_category_link( $category->term_id ) ) . '" title="' . esc_attr( $category->name ) . '">' . $category->name . '</a>' . $after;
 
@@ -662,7 +670,7 @@ if ( ! function_exists( 'pixelgrade_shape_comment' ) ) {
 	 * @param int        $depth
 	 */
 	function pixelgrade_shape_comment( $comment, $args, $depth ) {
-		$GLOBALS['comment'] = $comment;
+		$GLOBALS['comment'] = $comment; // phpcs:ignore
 		switch ( $comment->comment_type ) :
 			case 'pingback':
 			case 'trackback':
@@ -683,19 +691,16 @@ if ( ! function_exists( 'pixelgrade_shape_comment' ) ) {
 							<div class="comment__author vcard">
 								<?php
 								/* translators: %s: comment author link */
-								printf(
-									__( '%s <span class="says">says:</span>', '__components_txtd' ),
-									sprintf( '<b class="fn">%s</b>', get_comment_author_link( $comment ) )
-								);
+								printf( wp_kses_post( __( '%s <span class="says">says:</span>', '__components_txtd' ) ), sprintf( '<b class="fn">%s</b>', get_comment_author_link( $comment ) ) );
 								?>
 							</div><!-- .comment-author -->
 
 							<div class="comment__metadata">
 								<a href="<?php echo esc_url( get_comment_link( $comment, $args ) ); ?>">
-									<time datetime="<?php comment_time( 'c' ); ?>">
+									<time datetime="<?php esc_attr( get_comment_time( 'c' ) ); ?>">
 										<?php
 										/* translators: 1: comment date, 2: comment time */
-										printf( __( '%1$s at %2$s', '__components_txtd' ), get_comment_date( '', $comment ), get_comment_time() );
+										printf( esc_html__( '%1$s at %2$s', '__components_txtd' ), esc_html( get_comment_date( '', $comment ) ), esc_html( get_comment_time() ) );
 										?>
 									</time>
 								</a>
@@ -708,7 +713,7 @@ if ( ! function_exists( 'pixelgrade_shape_comment' ) ) {
 						</header><!-- .comment-meta -->
 
 						<div class="comment__content">
-							<?php comment_text(); ?>
+							<?php comment_text( $comment ); ?>
 						</div><!-- .comment-content -->
 
 						<?php
@@ -721,7 +726,8 @@ if ( ! function_exists( 'pixelgrade_shape_comment' ) ) {
 									'before'    => '<div class="reply">',
 									'after'     => '</div>',
 								)
-							)
+							),
+							$comment
 						);
 						?>
 					</div>
@@ -745,11 +751,11 @@ if ( ! function_exists( 'pixelgrade_the_post_custom_css' ) ) {
 			// This metabox is defined in the Pixelgrade_Blog_Metaboxes class
 			$custom_css = get_post_meta( get_the_ID(), 'custom_css_style', true );
 			if ( ! empty( $custom_css ) ) {
-				$output .= '<div class="custom-css" data-css="' . esc_attr( $custom_css ) . '"></div>' . PHP_EOL;
+				$output .= '<div class="custom-css" data-css="' . esc_attr( $custom_css ) . "\"></div>\n";
 			}
 
 			// Allow others to modify this
-			echo apply_filters( 'pixelgrade_the_post_custom_css', $output, get_the_ID(), $location );
+			echo apply_filters( 'pixelgrade_the_post_custom_css', $output, get_the_ID(), $location ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 	}
 }
@@ -803,7 +809,7 @@ if ( ! function_exists( 'pixelgrade_the_posts_pagination' ) ) {
 	 *                    Default empty array.
 	 */
 	function pixelgrade_the_posts_pagination( $args = array() ) {
-		echo pixelgrade_get_the_posts_pagination( $args );
+		echo pixelgrade_get_the_posts_pagination( $args ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 }
 
@@ -851,18 +857,38 @@ if ( ! function_exists( 'pixelgrade_posted_on' ) ) {
 			esc_html( get_the_modified_date() )
 		);
 
-		$posted_on = sprintf(
-			/* translators: %s: The current post's posted date, in the post header */
-			esc_html_x( '%s', 'post date', '__components_txtd' ),
-			'<a href="' . esc_url( get_permalink() ) . '" rel="bookmark">' . $time_string . '</a>'
+		printf( '<span class="byline"> <span class="by">%1$s</span> <span class="author vcard"><a class="url fn n" href="%2$s">%3$s</a></span></span><span class="posted-on"><a href="%4$s" rel="bookmark">%5$s</a></span>',
+			esc_html_x( 'by', 'post author', '__components_txtd' ),
+			esc_url( get_author_posts_url( get_the_author_meta( 'ID' ) ) ),
+			esc_html( get_the_author() ),
+			esc_url( get_permalink() ),
+			wp_kses( $time_string, array( 'time' => array( 'class' => true, 'datetime' => true, ) ) )
 		);
 
-		$byline = sprintf(
-			'<span class="by">' . esc_html_x( 'by', 'post author', '__components_txtd' ) . '</span> %s',
-			'<span class="author vcard"><a class="url fn n" href="' . esc_url( get_author_posts_url( get_the_author_meta( 'ID' ) ) ) . '">' . esc_html( get_the_author() ) . '</a></span>'
-		);
+	}
+}
 
-		echo '<span class="byline"> ' . $byline . '</span><span class="posted-on">' . $posted_on . '</span>'; // WPCS: XSS OK.
+if ( ! function_exists( 'pixelgrade_comments_toggle_checked_attribute' ) ) {
+	/**
+	 * Print the comment show/hide control's checked HTML attribute.
+	 *
+	 * We only accept two outcomes: either output 'checked="checked"' or nothing.
+	 */
+	function pixelgrade_comments_toggle_checked_attribute() {
+		// If the outcome is not falsy, output the attribute.
+		if ( pixelgrade_get_comments_toggle_checked_attribute() ) {
+			echo 'checked="checked"';
+		}
+	}
+}
 
+if ( ! function_exists( 'pixelgrade_get_comments_toggle_checked_attribute' ) ) {
+	/**
+	 * Return the comment show/hide control's checked HTML attribute.
+	 *
+	 * @return string
+	 */
+	function pixelgrade_get_comments_toggle_checked_attribute() {
+		return apply_filters( 'pixelgrade_get_comments_toggle_checked_attribute', 'checked="checked"' );
 	}
 }
