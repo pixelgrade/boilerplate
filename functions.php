@@ -128,9 +128,51 @@ if ( ! function_exists( 'boilerplate_setup' ) ) {
 		 * @link https://make.wordpress.org/core/2016/11/10/visible-edit-shortcuts-in-the-customizer-preview/
 		 */
 		add_theme_support( 'customize-selective-refresh-widgets' );
+
+		/**
+		 * Enable support for the Style Manager Customizer section (via Customify).
+		 */
+		add_theme_support( 'customizer_style_manager' );
 	}
 }
 add_action( 'after_setup_theme', 'boilerplate_setup', 10 );
+
+/**
+ * Enqueue scripts and styles.
+ */
+function boilerplate_scripts() {
+	$theme           = wp_get_theme();
+	$main_style_deps = array();
+	$suffix          = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
+
+	wp_enqueue_style( 'boilerplate-google-fonts', boilerplate_google_fonts_url() );
+
+	/* The main theme stylesheet */
+	wp_enqueue_style( 'boilerplate-style', get_template_directory_uri() . '/style.css', $main_style_deps, $theme->get( 'Version' ) );
+	wp_style_add_data( 'boilerplate-style', 'rtl', 'replace' );
+
+	/* Scripts */
+
+	// The main script.
+	wp_enqueue_script( 'boilerplate-scripts', get_theme_file_uri( '/assets/js/scripts' . $suffix . '.js' ), array( 'jquery', ), $theme->get( 'Version' ), true );
+
+	wp_localize_script( 'boilerplate-scripts', 'boilerplateStrings', array(
+		'ajaxurl' => admin_url( 'admin-ajax.php' ),
+	) );
+}
+add_action( 'wp_enqueue_scripts', 'boilerplate_scripts' );
+
+function boilerplate_load_wp_admin_style() {
+	wp_register_style( 'boilerplate_wp_admin_css', get_template_directory_uri() . '/admin.css', false, '1.0.0' );
+	wp_enqueue_style( 'boilerplate_wp_admin_css' );
+}
+add_action( 'admin_enqueue_scripts', 'boilerplate_load_wp_admin_style' );
+
+function boilerplate_gutenberg_styles() {
+	wp_enqueue_style( 'boilerplate-gutenberg', get_theme_file_uri( '/editor.css' ), false );
+	wp_enqueue_style( 'boilerplate-google-fonts', boilerplate_google_fonts_url() );
+}
+add_action( 'enqueue_block_editor_assets', 'boilerplate_gutenberg_styles' );
 
 /**
  * Set the content width in pixels, based on the theme's design and stylesheet.
@@ -155,37 +197,6 @@ function boilerplate_custom_tiled_gallery_width() {
 }
 add_filter( 'tiled_gallery_content_width', 'boilerplate_custom_tiled_gallery_width' );
 
-/**
- * Enqueue scripts and styles.
- */
-function boilerplate_scripts() {
-	$theme           = wp_get_theme();
-	$main_style_deps = array();
-
-	/* The main theme stylesheet */
-	if ( ! is_rtl() ) {
-		wp_enqueue_style( 'boilerplate-style', get_stylesheet_uri(), $main_style_deps, $theme->get( 'Version' ) );
-	}
-
-	/* Scripts */
-
-	//The main script
-	wp_enqueue_script( 'boilerplate-commons-scripts', get_theme_file_uri( '/assets/js/commons.js' ), array( 'jquery' ), $theme->get( 'Version' ), true );
-	wp_enqueue_script( 'boilerplate-scripts', get_theme_file_uri( '/assets/js/app.bundle.js' ), array( 'boilerplate-commons-scripts' ), $theme->get( 'Version' ), true );
-
-	$localization_array = array(
-		'ajaxurl' => admin_url( 'admin-ajax.php' ),
-	);
-
-	wp_localize_script( 'boilerplate-main-scripts', 'boilerplateStrings', $localization_array );
-}
-add_action( 'wp_enqueue_scripts', 'boilerplate_scripts' );
-
-function boilerplate_load_wp_admin_style() {
-	wp_register_style( 'boilerplate_wp_admin_css', get_template_directory_uri() . '/admin.css', false, '1.0.0' );
-	wp_enqueue_style( 'boilerplate_wp_admin_css' );
-}
-add_action( 'admin_enqueue_scripts', 'boilerplate_load_wp_admin_style' );
 
 /*
  * ==================================================

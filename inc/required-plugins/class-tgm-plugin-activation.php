@@ -331,38 +331,38 @@ if ( ! class_exists( 'TGM_Plugin_Activation' ) ) {
 				/* translators: %s: plugin name. */
 				'updating'                        => esc_html__( 'Updating Plugin: %s', '__theme_txtd' ),
 				'oops'                            => esc_html__( 'Something went wrong with the plugin API.', '__theme_txtd' ),
-				'notice_can_install_required'     => _n_noop(
 				/* translators: 1: plugin name(s). */
+				'notice_can_install_required'     => _n_noop(
 					'This theme requires the following plugin: %1$s.',
 					'This theme requires the following plugins: %1$s.',
 					'__theme_txtd'
 				),
-				'notice_can_install_recommended'  => _n_noop(
 				/* translators: 1: plugin name(s). */
+				'notice_can_install_recommended'  => _n_noop(
 					'This theme recommends the following plugin: %1$s.',
 					'This theme recommends the following plugins: %1$s.',
 					'__theme_txtd'
 				),
-				'notice_ask_to_update'            => _n_noop(
 				/* translators: 1: plugin name(s). */
+				'notice_ask_to_update'            => _n_noop(
 					'The following plugin needs to be updated to its latest version to ensure maximum compatibility with this theme: %1$s.',
 					'The following plugins need to be updated to their latest version to ensure maximum compatibility with this theme: %1$s.',
 					'__theme_txtd'
 				),
-				'notice_ask_to_update_maybe'      => _n_noop(
 				/* translators: 1: plugin name(s). */
+				'notice_ask_to_update_maybe'      => _n_noop(
 					'There is an update available for: %1$s.',
 					'There are updates available for the following plugins: %1$s.',
 					'__theme_txtd'
 				),
-				'notice_can_activate_required'    => _n_noop(
 				/* translators: 1: plugin name(s). */
+				'notice_can_activate_required'    => _n_noop(
 					'The following required plugin is currently inactive: %1$s.',
 					'The following required plugins are currently inactive: %1$s.',
 					'__theme_txtd'
 				),
-				'notice_can_activate_recommended' => _n_noop(
 				/* translators: 1: plugin name(s). */
+				'notice_can_activate_recommended' => _n_noop(
 					'The following recommended plugin is currently inactive: %1$s.',
 					'The following recommended plugins are currently inactive: %1$s.',
 					'__theme_txtd'
@@ -709,7 +709,7 @@ if ( ! class_exists( 'TGM_Plugin_Activation' ) ) {
 			}
 
 			// All plugin information will be stored in an array for processing.
-			$slug = $this->sanitize_key( urldecode( $_GET['plugin'] ) );
+			$slug = $this->sanitize_key( urldecode( $_GET['plugin'] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
 
 			if ( ! isset( $this->plugins[ $slug ] ) ) {
 				return false;
@@ -965,7 +965,7 @@ if ( ! class_exists( 'TGM_Plugin_Activation' ) ) {
 					if ( ! $automatic ) {
 						// Make sure message doesn't display again if bulk activation is performed
 						// immediately after a single activation.
-						if ( ! isset( $_POST['action'] ) ) { // WPCS: CSRF OK.
+						if ( ! isset( $_POST['action'] ) ) {
 							echo '<div id="message" class="updated"><p>', esc_html( $this->strings['activated_successfully'] ), ' <strong>', esc_html( $this->plugins[ $slug ]['name'] ), '.</strong></p></div>';
 						}
 					} else {
@@ -986,7 +986,7 @@ if ( ! class_exists( 'TGM_Plugin_Activation' ) ) {
 				if ( ! $automatic ) {
 					// Make sure message doesn't display again if bulk activation is performed
 					// immediately after a single activation.
-					if ( ! isset( $_POST['action'] ) ) { // WPCS: CSRF OK.
+					if ( ! isset( $_POST['action'] ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
 						echo '<div id="message" class="error"><p>',
 						sprintf(
 							esc_html( $this->strings['plugin_needs_higher_version'] ),
@@ -1638,10 +1638,10 @@ if ( ! class_exists( 'TGM_Plugin_Activation' ) ) {
 			if ( 'update-core' === $screen->base ) {
 				// Core update screen.
 				return true;
-			} elseif ( 'plugins' === $screen->base && ! empty( $_POST['action'] ) ) { // WPCS: CSRF ok.
+			} elseif ( 'plugins' === $screen->base && ! empty( $_POST['action'] ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
 				// Plugins bulk update screen.
 				return true;
-			} elseif ( 'update' === $screen->base && ! empty( $_POST['action'] ) ) { // WPCS: CSRF ok.
+			} elseif ( 'update' === $screen->base && ! empty( $_POST['action'] ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
 				// Individual updates (ajax call).
 				return true;
 			}
@@ -2136,7 +2136,7 @@ if ( ! class_exists( 'TGMPA_List_Table' ) ) {
 				)
 			);
 
-			if ( isset( $_REQUEST['plugin_status'] ) && in_array( $_REQUEST['plugin_status'], array( 'install', 'update', 'activate' ), true ) ) {
+			if ( isset( $_REQUEST['plugin_status'] ) && in_array( $_REQUEST['plugin_status'], array( 'install', 'update', 'activate' ), true ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
 				$this->view_context = sanitize_key( $_REQUEST['plugin_status'] );
 			}
 
@@ -2765,10 +2765,10 @@ if ( ! class_exists( 'TGMPA_List_Table' ) ) {
 				}
 
 				if ( is_array( $_POST['plugin'] ) ) {
-					$plugins_to_install = (array) $_POST['plugin'];
-				} elseif ( is_string( $_POST['plugin'] ) ) {
+					$plugins_to_install = (array) $_POST['plugin']; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+				} elseif ( is_string( $_POST['plugin'] ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
 					// Received via Filesystem page - un-flatten array (WP bug #19643).
-					$plugins_to_install = explode( ',', $_POST['plugin'] );
+					$plugins_to_install = explode( ',', $_POST['plugin'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
 				}
 
 				// Sanitize the received input.
@@ -2913,7 +2913,7 @@ if ( ! class_exists( 'TGMPA_List_Table' ) ) {
 				// Grab plugin data from $_POST.
 				$plugins = array();
 				if ( isset( $_POST['plugin'] ) ) {
-					$plugins = array_map( 'urldecode', (array) $_POST['plugin'] );
+					$plugins = array_map( 'urldecode', (array) $_POST['plugin'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
 					$plugins = array_map( array( $this->tgmpa, 'sanitize_key' ), $plugins );
 				}
 
@@ -2947,7 +2947,7 @@ if ( ! class_exists( 'TGMPA_List_Table' ) ) {
 					$last_plugin  = array_pop( $plugin_names ); // Pop off last name to prep for readability.
 					$imploded     = empty( $plugin_names ) ? $last_plugin : ( implode( ', ', $plugin_names ) . ' ' . esc_html_x( 'and', 'plugin A *and* plugin B', '__theme_txtd' ) . ' ' . $last_plugin );
 
-					printf( // WPCS: xss ok.
+					printf(
 						'<div id="message" class="updated"><p>%1$s %2$s.</p></div>',
 						esc_html( _n( 'The following plugin was activated successfully:', 'The following plugins were activated successfully:', $count, '__theme_txtd' ) ),
 						$imploded

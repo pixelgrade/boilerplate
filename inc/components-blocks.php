@@ -9,6 +9,7 @@
  */
 
 /**
+ * @todo EXAMPLE!!! PLEASE DO NOT LEAVE IT LIKE THIS!!!
  * Register new blog blocks, besides the ones provided by the blog component.
  *
  * @param string $component_slug The component's slug.
