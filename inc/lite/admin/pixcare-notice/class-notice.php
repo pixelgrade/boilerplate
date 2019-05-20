@@ -250,6 +250,8 @@ class PixelgradeCare_Install_Notice {
 			return '';
 		}
 
+		$path = wp_normalize_path( $path );
+
 		$path = str_replace( trailingslashit( get_template_directory() ), '', $path );
 
 		return trailingslashit( $path );
