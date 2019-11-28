@@ -195,3 +195,10 @@ function boilerplate_maybe_load_pro_features() {
 }
 // We want to do this as early as possible. So the zero priority is as intended.
 add_action( 'after_setup_theme', 'boilerplate_maybe_load_pro_features', 0 );
+
+function boilerplate_woocommerce_setup() {
+	if ( function_exists( 'WC') && pixelgrade_user_has_access('woocommerce') ) {
+		require_once trailingslashit( get_template_directory() ) . 'inc/integrations/woocommerce.php';
+	}
+}
+add_action( 'after_setup_theme', 'boilerplate_woocommerce_setup', 10 );

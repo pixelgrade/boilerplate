@@ -26,6 +26,9 @@ function boilerplate_setup_components() {
 	add_theme_support( 'pixelgrade-gallery-settings-component' );
 	add_theme_support( 'pixelgrade-multipage-component' );
 	add_theme_support( 'pixelgrade-portfolio-component' );
+
+	if ( pixelgrade_user_has_access( 'woocommerce' ) ) {
+		add_theme_support( 'pixelgrade-woocommerce-component' );
 }
 add_action( 'after_setup_theme', 'boilerplate_setup_components', 10 );
 

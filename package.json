@@ -1,27 +1,38 @@
 {
   "name": "boilerplate",
-  "dependencies": {},
+  "sideEffects": false,
+  "scripts": {
+    "styles": "gulp styles",
+    "build": "gulp scripts && gulp styles",
+    "zip": "npm run build && gulp zip",
+    "watch": "npm run scripts:dev & gulp watch",
+    "server": "npm run scripts:dev & gulp bs"
+  },
   "devDependencies": {
-    "browser-sync": "^2.26.3",
-    "del": "^4.1.0",
-    "gulp": "^4.0.0",
-    "gulp-autoprefixer": "^6.0.0",
+    "browser-sync": "^2.26.7",
+    "command-exists": "^1.2.8",
+    "del": "^5.1.0",
+    "gsap": "^2.1.3",
+    "gulp": "^4.0.2",
+    "gulp-autoprefixer": "^7.0.1",
     "gulp-concat": "^2.6.1",
     "gulp-debug": "^4.0.0",
-    "gulp-eol": "^0.2.0",
-    "gulp-exec": "^3.0.2",
-    "gulp-json-to-sass-map": "^1.0.4",
-    "gulp-load-plugins": "^1.5.0",
+    "gulp-exec": "^4.0.0",
+    "gulp-json-to-sass-map": "^1.0.5",
+    "gulp-load-plugins": "^2.0.1",
     "gulp-prompt": "^1.2.0",
     "gulp-rename": "^1.4.0",
     "gulp-replace": "^1.0.0",
     "gulp-rsync": "0.0.8",
-    "gulp-rtlcss": "^1.3.0",
+    "gulp-rtlcss": "^1.4.0",
     "gulp-sass": "^4.0.2",
     "gulp-sourcemaps": "^2.6.5",
+    "gulp-terser": "^1.2.0",
     "gulp-util": "^3.0.8",
-    "require-dir": "*",
-    "through2": "*",
-    "path": "*"
+    "require-dir": "^1.2.0",
+    "through2": "^3.0.1"
+  },
+  "dependencies": {
+    "yargs": "^14.2.0"
   }
 }

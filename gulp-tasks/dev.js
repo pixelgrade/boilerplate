@@ -119,6 +119,9 @@ var jsFiles = [
 function scriptsMain() {
   return gulp.src( jsFiles )
     .pipe( plugins.concat( 'main.js' ) )
+    .pipe( gulp.dest( './assets/js/' ) )
+    .pipe(plugins.terser())
+    .pipe(plugins.rename('main.min.js'))
     .pipe( gulp.dest( './assets/js/' ) );
 }
 scriptsMain.description = 'Concatenate all JS into main.js and wrap all code in a closure.';
