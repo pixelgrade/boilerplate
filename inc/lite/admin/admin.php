@@ -8,10 +8,11 @@
 function boilerplate_lite_admin_setup() {
 
 	/**
-	 * Load and initialize Pixelgrade Care notice logic.
+	 * Load and initialize Pixelgrade Assistant notice logic.
+	 * @link https://wordpress.org/plugins/pixelgrade-assistant/
 	 */
-	require_once 'pixcare-notice/class-notice.php'; // phpcs:ignore
-	PixelgradeCare_Install_Notice::init();
+	require_once trailingslashit( get_template_directory() ) . 'inc/admin/pixelgrade-assistant-notice/class-notice.php';
+	PixelgradeAssistant_Install_Notice::init();
 }
 add_action( 'after_setup_theme', 'boilerplate_lite_admin_setup' );
 

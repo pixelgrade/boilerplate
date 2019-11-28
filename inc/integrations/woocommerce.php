@@ -11,12 +11,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 function boilerplate_woocommerce_styles() {
 	$theme  = wp_get_theme( get_template() );
-	wp_enqueue_style( 'fargo-woocommerce', get_template_directory_uri() . '/woocommerce.css', array( 'fargo-style' ), $theme->get( 'Version' ) );
+	wp_enqueue_style( 'boilerplate-woocommerce', get_template_directory_uri() . '/woocommerce.css', array( 'boilerplate-style' ), $theme->get( 'Version' ) );
 }
 
 add_action( 'wp_enqueue_scripts', 'boilerplate_woocommerce_styles', 10 );
 
-function alterCartMenuItem() {
+function boilerplate_alterCartMenuItem() {
 	$cart_item_count = WC()->cart->get_cart_contents_count();
 	$cart_count_span = '';
 	$class = '';
@@ -35,7 +35,7 @@ function alterCartMenuItem() {
 function boilerplate_remove_cart_menu_icon() {
 	$woocommerce_layout_instance = Pixelgrade_Woocommerce_Layout::instance( null );
 	remove_filter( 'wp_nav_menu_items', array( $woocommerce_layout_instance, 'appendCartIconToMenu' ), 10 );
-	add_action('pixelgrade_header_before_navbar_content', 'alterCartMenuItem', 10);
+	add_action('pixelgrade_header_before_navbar_content', 'boilerplate_alterCartMenuItem', 10);
 }
 add_action( 'init', 'boilerplate_remove_cart_menu_icon', 20 );
 
