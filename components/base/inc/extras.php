@@ -1087,22 +1087,27 @@ if ( ! function_exists( 'pixelgrade_get_card_contents' ) ) {
 			'primary_meta'   => array(
 				'blog'        => 'category',
 				'woocommerce' => 'category',
+                'portfolio'   => 'none',
 			),
 			'secondary_meta' => array(
 				'blog'        => 'date',
 				'woocommerce' => 'none',
+                'portfolio'   => 'none',
 			),
 			'heading'        => array(
 				'blog'        => 'title',
 				'woocommerce' => 'title',
+                'portfolio'   => 'title',
 			),
 			'content'        => array(
 				'blog'        => 'excerpt',
 				'woocommerce' => 'price',
+                'portfolio'   => 'none',
 			),
 			'footer'         => array(
 				'blog'        => 'read_more',
 				'woocommerce' => 'none',
+                'portfolio'   => 'none',
 			),
 		) );
 

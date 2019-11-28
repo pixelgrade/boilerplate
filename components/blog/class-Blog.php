@@ -1055,7 +1055,7 @@ class Pixelgrade_Blog extends Pixelgrade_Component {
 			$classes[] = 'full-width';
 		}
 
-		if ( is_page() ) {
+		if ( is_page( get_the_ID() ) ) {
 			$classes[] = 'u-content-bottom-spacing';
 		}
 
